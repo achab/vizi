@@ -3,6 +3,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.twitter._
 import org.apache.spark.streaming.StreamingContext._
+import scala.collection.mutable._
 import TutorialHelper._
 
 object Tutorial {
@@ -27,10 +28,29 @@ object Tutorial {
     // Set StreamingContext
     val ssc = new StreamingContext(sparkUrl, "Tutorial", Seconds(1), sparkHome, Seq(jarFile))
 
-    val filters = Array("#SOSPascal", "#TontonsFlingueurs")
-    val tweets = TwitterUtils.createStream(ssc, None)
+    val filters = Array("#Pakistan")
+    val tweets = TwitterUtils.createStream(ssc, None, filters)
     val statuses = tweets.map(status => status.getText())
-    statuses.print()
+    val words = statuses.flatMap(status => status.split(" "))
+    val hashtags = words.filter(word => word.startsWith("Eiffel"))
+
+    /*
+    val counts = hashtags.map(tag => (tag, 1))
+                         .reduceByKeyAndWindow(_ + _, _ - _, Seconds(60 * 2), Seconds(1))
+    val sortedCounts = counts.map { case(tag, count) => (count, tag) }
+                             .transform(rdd => rdd.sortByKey(false))
+    sortedCounts.foreach(rdd =>
+      println("\nTop 10 hashtags:\n" + rdd.take(10).mkString("\n")))
+
+    val arr = new ArrayBuffer[String]();
+    words.foreachRDD {
+        arr ++= _.collect() //you can now put it in an array or d w/e you want with it
+        // ...
+    }
+    */
+
+    statuses.saveAsTextFiles("output/statuses")
+
 
     ssc.checkpoint(checkpointDir)
     ssc.start()

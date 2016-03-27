@@ -1,3 +1,6 @@
+output/
+metastore_db/
+
 #####=== Scala ===#####
 
 *.class
