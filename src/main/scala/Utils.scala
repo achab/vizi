@@ -1,13 +1,18 @@
+import com.fasterxml.jackson.annotation.ObjectIdGenerators.None
+import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.streaming._
 import org.apache.spark.storage.StorageLevel
+import twitter4j.auth.OAuthAuthorization
+import twitter4j.conf.ConfigurationBuilder
 import scala.io.Source
 import scala.collection.mutable.HashMap
 import java.io.File
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
 import sys.process.stringSeqToProcess
+//import org.apache.commons.cli._
 
-object TutorialHelper {
+object Utils {
   Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
   Logger.getLogger("org.apache.spark.streaming.NetworkInputTracker").setLevel(Level.INFO)
 
@@ -39,32 +44,35 @@ object TutorialHelper {
     println()
   }
 
-  /** Returns the Spark URL */
-  def getSparkUrl(): String = {
-    val file = new File("/root/spark-ec2/cluster-url")
-    if (file.exists) {
-      val url = Source.fromFile(file.toString).getLines.toSeq.head
-      url
-    } else if (new File("../local").exists) {
-      "local[4]"
-    } else {
-      throw new Exception("Could not find " + file)
-    }
+  def getAuth = {
+    Some(new OAuthAuthorization(new ConfigurationBuilder().build()))
   }
 
-  /** Returns the HDFS URL */
-  def getHdfsUrl(): String = {
+  /*
+  val THE_OPTIONS = {
+    val options = new Options()
+    options
+  }
+
+  def parseCommandLine(args: Array[String]) = {
+    val parser = new PosixParser
     try {
-      val name : String = Seq("bash", "-c", "curl -s http://169.254.169.254/latest/meta-data/hostname") !! ;
-      println("Hostname = " + name)
-      "hdfs://" + name.trim + ":9000"
+      val cl = parser.parse(THE_OPTIONS, args)
+      cl.getArgList.toArray
     } catch {
-      case e: Exception => {
-        if (new File("../local").exists) {
-          "."
-        } else {
-          throw e
-        }
+      case e: ParseException =>
+        System.err.println("Parsing failed. Reason: " + e.getMessage)
+        System.exit(1)
+    }
+  }
+  */
+
+  object IntParam {
+    def unapply(str: String): Option[Int] = {
+      try {
+        Some(str.toInt)
+      } catch {
+        case e: NumberFormatException => None
       }
     }
   }
