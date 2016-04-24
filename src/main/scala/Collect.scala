@@ -35,7 +35,7 @@ object Collect {
 
     // Set StreamingContext
     val ssc = new StreamingContext(sparkUrl, "Tutorial", Seconds(1), sparkHome, Seq(jarFile))
-    val filters = Array("Bale")
+    val filters = Array("Sakho")
     val tweets = TwitterUtils.createStream(ssc, None, filters)
     val statuses = tweets.map(status => status.getText())
     val words = statuses.flatMap(status => status.split(" "))
@@ -60,7 +60,7 @@ object Collect {
     statuses.foreachRDD((rdd, time) => {
       val count = rdd.count()
       if (count > 0) {
-        val outputRDD = rdd.repartition(1)
+        val outputRDD = rdd.repartition(100)
         outputRDD.saveAsTextFile("output/tweets_" + time.milliseconds.toString)
         numTweetsCollected += count
         if (numTweetsCollected > numTweetsToCollect) {
