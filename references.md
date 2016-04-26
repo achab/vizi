@@ -1,3 +1,6 @@
+## HDFS
+http://www.tutorialspoint.com/hadoop/hadoop_big_data_overview.htm
+
 ## Deep dive into Spark Streaming
 http://fr.slideshare.net/spark-project/deep-divewithsparkstreaming-tathagatadassparkmeetup20130617
 
