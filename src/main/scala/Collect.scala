@@ -35,7 +35,7 @@ object Collect {
 
     // Set StreamingContext
     val ssc = new StreamingContext(sparkUrl, "Tutorial", Seconds(1), sparkHome, Seq(jarFile))
-    val filters = Array("Sakho")
+    val filters = Array("Gareth Bale")
     val tweets = TwitterUtils.createStream(ssc, None, filters)
     val statuses = tweets.map(status => status.getText())
     val words = statuses.flatMap(status => status.split(" "))

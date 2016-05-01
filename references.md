@@ -12,4 +12,6 @@ https://www.youtube.com/watch?v=FjhRkfAuU7I#t=2035
 ## More general references
 http://spark.apache.org/docs/latest/streaming-programming-guide.html
 
+http://insightdataengineering.com/blog/pipeline_map.html
+
 https://dev.twitter.com/streaming/overview
