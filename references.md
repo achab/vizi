@@ -1,3 +1,6 @@
+## Sentiment Analysis in Scala
+https://github.com/shekhargulati/52-technologies-in-2016/tree/master/03-stanford-corenlp
+
 ## Twitter related librairies
 http://twitter.github.io/finagle/guide/
 
