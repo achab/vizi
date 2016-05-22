@@ -1,3 +1,10 @@
+## Twitter related librairies
+http://twitter.github.io/finagle/guide/
+
+http://twitter.github.io/twitter-server/
+
+http://twitter.github.io/finatra/user-guide/
+
 ## HDFS
 http://www.tutorialspoint.com/hadoop/hadoop_big_data_overview.htm
 
