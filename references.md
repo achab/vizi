@@ -11,7 +11,9 @@ http://twitter.github.io/finatra/user-guide/
 ## HDFS
 http://www.tutorialspoint.com/hadoop/hadoop_big_data_overview.htm
 
-## Deep dive into Spark Streaming
+## Spark
+https://www.brighttalk.com/mybrighttalk/knowledge-feed
+
 http://fr.slideshare.net/spark-project/deep-divewithsparkstreaming-tathagatadassparkmeetup20130617
 
 ## Twitter Streaming Language Classifier by Apache
