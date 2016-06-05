@@ -1,5 +1,3 @@
-import com.fasterxml.jackson.annotation.ObjectIdGenerators.None
-import net.liftweb.json.JsonParser.ParseException
 import org.apache.spark.streaming._
 import org.apache.spark.storage.StorageLevel
 import twitter4j.auth.OAuthAuthorization
@@ -44,26 +42,13 @@ object Utils {
     println()
   }
 
-  def getAuth = {
-    Some(new OAuthAuthorization(new ConfigurationBuilder().build()))
-  }
-
-  /*
-  val THE_OPTIONS = {
-    val options = new Options()
-    options
-  }
+/*
+  case class Config(filterTag: String = "", numTweetsToCollect: Int = 1000, outputDirectory: String = "output/")
 
   def parseCommandLine(args: Array[String]) = {
-    val parser = new PosixParser
-    try {
-      val cl = parser.parse(THE_OPTIONS, args)
-      cl.getArgList.toArray
-    } catch {
-      case e: ParseException =>
-        System.err.println("Parsing failed. Reason: " + e.getMessage)
-        System.exit(1)
-    }
+    val parser = new OptionParser[Config]("scopt")
+    val cl = parser.parse(THE_OPTIONS, args)
+    cl.getArgList.toArray
   }
 
 
@@ -76,6 +61,7 @@ object Utils {
       }
     }
   }
+
   */
 
 }

@@ -5,7 +5,7 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.twitter._
 import org.apache.spark.streaming.StreamingContext._
 import scala.collection.mutable._
-import Utils._
+import Utils.{configureTwitterCredentials}
 
 object Collect {
   private var numTweetsCollected = 0L
@@ -15,27 +15,27 @@ object Collect {
 
     val sparkHome = "/Users/massil/Programmation/spark/spark" // Location of the Spark directory
     val sparkUrl = "local[4]" // URL of the Spark cluster
-    val jarFile = "target/scala-2.10/tutorial_2.10-0.1-SNAPSHOT.jar" // Location of the required JAR files
+    val jarFile = "target/scala-2.10/vizi_2.10-0.1-SNAPSHOT.jar" // Location of the required JAR files
     // val checkpointDir = "/Users/massil/Desktop/tmp" // HDFS directory for checkpointing
 
-    /*
     // Process program arguments and set properties
     if (args.length < 2) {
       System.err.println("Usage: " + this.getClass.getSimpleName +
-        "<filterTag> <outputDirectory> <numTweetsToCollect>")
+        "<filterTag> <numTweetsToCollect>")
       System.exit(1)
     }
 
-    val Array(filterTag, outputDirectory, Utils.IntParam(numTweetsToCollect)) =
-      Utils.parseCommandLine()
-    */
+    val filterTag = args(0)
+    val numTweetsToCollect = args(1).toInt
+    val outputDirectory = filterTag + "/"
+    //val Array(filterTag, outputDirectory, Utils.IntParam(numTweetsToCollect)) = Utils.parseCommandLine()
 
     // Configure Twitter credentials using twitter.txt
-    Utils.configureTwitterCredentials()
+    configureTwitterCredentials()
 
     // Set StreamingContext
-    val ssc = new StreamingContext(sparkUrl, "Tutorial", Seconds(1), sparkHome, Seq(jarFile))
-    val filters = Array("#BiodiversityDay")
+    val ssc = new StreamingContext(sparkUrl, "Vizi", Seconds(1), sparkHome, Seq(jarFile))
+    val filters = Array(filterTag)
     val tweets = TwitterUtils.createStream(ssc, None, filters)
     val statuses = tweets.map(status => status.getText())
     val words = statuses.flatMap(status => status.split(" "))
@@ -58,11 +58,11 @@ object Collect {
     */
 
     // statuses.saveAsTextFiles("output/statuses")
-    tagCounts.foreachRDD((rdd, time) => {
+    statuses.foreachRDD((rdd, time) => {
       val count = rdd.count()
       if (count > 0) {
         val outputRDD = rdd.repartition(100)
-        outputRDD.saveAsTextFile("output/hashtags_" + time.milliseconds.toString)
+        outputRDD.saveAsTextFile(outputDirectory + "output_" + time.milliseconds.toString)
         numTweetsCollected += count
         if (numTweetsCollected > numTweetsToCollect) {
           System.exit(0)
