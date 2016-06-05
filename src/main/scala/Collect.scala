@@ -8,7 +8,7 @@ import scala.collection.mutable._
 import Utils.{configureTwitterCredentials}
 
 object Collect {
-  private var numTweetsCollected = 0L
+  //private var numTweetsCollected = 0L
   //private var numTweetsToCollect = 1000
 
   def main(args: Array[String]) {
@@ -21,12 +21,13 @@ object Collect {
     // Process program arguments and set properties
     if (args.length < 2) {
       System.err.println("Usage: " + this.getClass.getSimpleName +
-        "<filterTag> <numTweetsToCollect>")
+        "<filterTag> <timeLength>")
       System.exit(1)
     }
 
     val filterTag = args(0)
-    val numTweetsToCollect = args(1).toInt
+    val timeLength = args(1).toInt
+    //val numTweetsToCollect = args(1).toInt
     val outputDirectory = filterTag + "/"
     //val Array(filterTag, outputDirectory, Utils.IntParam(numTweetsToCollect)) = Utils.parseCommandLine()
 
@@ -34,22 +35,22 @@ object Collect {
     configureTwitterCredentials()
 
     // Set StreamingContext
-    val ssc = new StreamingContext(sparkUrl, "Vizi", Seconds(5), sparkHome, Seq(jarFile))
+    val ssc = new StreamingContext(sparkUrl, "Vizi", Seconds(1), sparkHome, Seq(jarFile))
     val filters = Array(filterTag)
     // passing None as second argument force the using of Twitter4j's default authentification, in twitter4j.properties file
     val tweets = TwitterUtils.createStream(ssc, None, filters)
     val statuses = tweets.map(status => status.getText())
     val words = statuses.flatMap(status => status.split(" "))
-    //val hashtags = words.filter(word => word.startsWith("#"))
+    val hashtags = words.filter(word => word.startsWith("#"))
     //val tagCounts = hashtags.window(Minutes(1), Seconds(1)).countByValue()
 
-    val counts = words.map(tag => (tag, 1))
-                         .reduceByKeyAndWindow((a: Int, b: Int) => a + b, Seconds(60 * 2), Seconds(10))
+    val counts = hashtags.map(tag => (tag, 1))
+                         .reduceByKeyAndWindow((a: Int, b: Int) => a + b, Seconds(timeLength * 2), Seconds(timeLength))
                          //.reduceByKeyAndWindow((a: Int, b: Int) => a + b,(a: Int, b: Int) => a - b, Seconds(30), Seconds(10))
     val sortedCounts = counts.map { case(tag, count) => (count, tag) }
                              .transform(rdd => rdd.sortByKey(false))
     sortedCounts.foreachRDD(rdd =>
-      println("\nTop 10 wordss:\n" + rdd.take(10).mkString("\n")))
+      println("\nTop 10 words:\n" + rdd.take(10).mkString("\n")))
 
     /*
     val arr = new ArrayBuffer[String]();
