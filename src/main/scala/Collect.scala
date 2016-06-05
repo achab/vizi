@@ -9,14 +9,14 @@ import Utils.{configureTwitterCredentials}
 
 object Collect {
   private var numTweetsCollected = 0L
-  private var numTweetsToCollect = 1000
+  //private var numTweetsToCollect = 1000
 
   def main(args: Array[String]) {
 
     val sparkHome = "/Users/massil/Programmation/spark/spark" // Location of the Spark directory
     val sparkUrl = "local[4]" // URL of the Spark cluster
     val jarFile = "target/scala-2.10/vizi_2.10-0.1-SNAPSHOT.jar" // Location of the required JAR files
-    // val checkpointDir = "/Users/massil/Desktop/tmp" // HDFS directory for checkpointing
+    val checkpointDir = "/Users/massil/Desktop/tmp" // HDFS directory for checkpointing
 
     // Process program arguments and set properties
     if (args.length < 2) {
@@ -34,28 +34,29 @@ object Collect {
     configureTwitterCredentials()
 
     // Set StreamingContext
-    val ssc = new StreamingContext(sparkUrl, "Vizi", Seconds(1), sparkHome, Seq(jarFile))
+    val ssc = new StreamingContext(sparkUrl, "Vizi", Seconds(5), sparkHome, Seq(jarFile))
     val filters = Array(filterTag)
+    // passing None as second argument force the using of Twitter4j's default authentification, in twitter4j.properties file
     val tweets = TwitterUtils.createStream(ssc, None, filters)
     val statuses = tweets.map(status => status.getText())
     val words = statuses.flatMap(status => status.split(" "))
-    val hashtags = words.filter(word => word.startsWith("#"))
-    val tagCounts = hashtags.window(Minutes(10), Seconds(1)).countByValue()
+    //val hashtags = words.filter(word => word.startsWith("#"))
+    //val tagCounts = hashtags.window(Minutes(1), Seconds(1)).countByValue()
 
-    /*
-    val counts = hashtags.map(tag => (tag, 1))
-                         .reduceByKeyAndWindow(_ + _, _ - _, Seconds(60 * 2), Seconds(1))
+    val counts = words.map(tag => (tag, 1))
+                         .reduceByKeyAndWindow((a: Int, b: Int) => a + b, Seconds(60 * 2), Seconds(10))
+                         //.reduceByKeyAndWindow((a: Int, b: Int) => a + b,(a: Int, b: Int) => a - b, Seconds(30), Seconds(10))
     val sortedCounts = counts.map { case(tag, count) => (count, tag) }
                              .transform(rdd => rdd.sortByKey(false))
-    sortedCounts.foreach(rdd =>
-      println("\nTop 10 hashtags:\n" + rdd.take(10).mkString("\n")))
+    sortedCounts.foreachRDD(rdd =>
+      println("\nTop 10 wordss:\n" + rdd.take(10).mkString("\n")))
 
+    /*
     val arr = new ArrayBuffer[String]();
     words.foreachRDD {
         arr ++= _.collect() //you can now put it in an array or d w/e you want with it
         // ...
     }
-    */
 
     // statuses.saveAsTextFiles("output/statuses")
     statuses.foreachRDD((rdd, time) => {
@@ -70,10 +71,10 @@ object Collect {
       }
     })
 
-    //ssc.checkpoint(checkpointDir)
+    */
+    ssc.checkpoint(checkpointDir)
     ssc.start()
     ssc.awaitTermination()
-
 
 
   }
