@@ -1,3 +1,8 @@
+## Streaming examples
+http://blog.scottlogic.com/2013/07/29/spark-stream-analysis.html
+
+https://github.com/apache/spark/tree/master/examples/src/main/scala/org/apache/spark/examples/streaming
+
 ## Sentiment Analysis in Scala
 https://github.com/shekhargulati/52-technologies-in-2016/tree/master/03-stanford-corenlp
 
